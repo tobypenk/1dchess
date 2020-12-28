@@ -1,0 +1,287 @@
+*
+	font-family: 'Playfair Display'
+	margin: 0
+	padding: 0
+	
+.logo
+	width: 32px
+	height: 32px
+	margin-left: 10px
+	margin-right: 10px
+	background-image: url("../media/logo/logo_black.svg")
+	background-position: center center
+	background-repeat: no-repeat
+	
+.branding
+	display: flex
+	align-items: center
+	font-size: 150%
+	color: black
+	text-decoration: none !important
+	
+.site-title
+	color: black
+	text-decoration: none !important
+	
+header
+	height: 40px
+	display: flex
+	align-items: center
+	
+.account-info
+	margin-left: 50%
+	transform: translateX(-50%)
+	text-align: center
+	
+.create-new-game
+	text-decoration: underline
+	color: blue
+
+table td, table th
+	padding-left: 4px
+	padding-right: 4px
+	
+.create-new-game:hover
+	cursor: pointer
+	
+.account-info > *:not(:first-child)
+	margin-top: 10px
+	
+td, th
+	padding-left: 5px
+	padding-right: 5px
+	white-space: nowrap
+	
+.existing-account,
+.create-account
+	margin-left: 50%
+	transform: translateX(-50%)
+	width: 200px
+	display: flex
+	justify-content: space-around
+	flex-wrap: wrap
+
+.account-stuff:not(.inactive) > .create-account > *
+	display: none
+	
+.account-stuff.inactive > .existing-account > *
+	display: none
+	
+.log-in,
+.log-out,
+.confirm-account-creation
+	color: darkblue
+	text-decoration: underline
+	width: 100%
+	text-align: center
+	margin-top: 10px
+	
+.log-in:hover,
+.log-out:hover,
+.confirm-account-creation:hover,
+.create-account-toggle:hover
+	cursor: pointer
+	
+input
+	margin-top: 6px
+
+.create-account-toggle
+	font-style: italic
+	margin-bottom: 10px
+	width: 100%
+	text-align: center
+
+.board
+	transition: all .2s
+	display: none
+	
+.end-view
+	display: flex
+	flex-direction: row
+	flex-wrap: nowrap
+	margin-top: 10px
+	width: 400px
+	margin-left: 50%
+	transform: translateX(-50%)
+	margin-top: 10px
+	
+.end-view .rank
+	height: 400px
+	display: flex
+	flex-direction: column
+	flex-wrap: nowrap
+	position: relative
+	
+.square.occluded
+	opacity: 0.0
+	pointer-events: none
+	
+.square.occluded.capturable,
+.square.occluded.available,
+.square.occluded.capturable-en-passant
+	opacity: 1.0
+	pointer-events: all
+	
+.square.occluded.available,
+.square.occluded.capturable-en-passant,
+.square.occluded.capturable
+	opacity: 1.0
+
+
+.end-view .square
+	width: 50px
+	position: absolute
+	height: 50px
+	
+$spreader: 50px
+
+.end-view .square[data-file-index='7']
+	margin-top: $spreader * 7
+	
+.end-view .square[data-file-index='6']
+	margin-top: $spreader * 6
+	
+.end-view .square[data-file-index='5']
+	margin-top: $spreader * 5
+	
+.end-view .square[data-file-index='4']
+	margin-top: $spreader * 4
+	
+.end-view .square[data-file-index='3']
+	margin-top: $spreader * 3
+	
+.end-view .square[data-file-index='2']
+	margin-top: $spreader * 2
+	
+.end-view .square[data-file-index='1']
+	margin-top: $spreader
+
+.rank
+	display: flex
+	flex-direction: row
+	flex-wrap: nowrap
+	width: 400px
+	height: 50px
+	
+
+
+	
+.pawn-promotion
+	width: 80px
+	height: 80px
+	background-size: contain
+	background-position: center center
+	background-repeat: no-repeat
+	box-sizing: border-box
+
+.pawn-promotion:hover
+	cursor: pointer	
+
+
+	
+.square
+	width: 50px
+	height: 50px
+	background-size: contain
+	background-position: center center
+	background-repeat: no-repeat
+	box-sizing: border-box
+	
+.square.W
+	background-color: rgb(200,200,200)
+	
+.square.active
+	border: 2px solid rgb(200,200,20)
+	
+.square.B
+	background-color: rgb(80,80,80)
+
+	
+	
+
+.square.B.available
+	background-color: rgb(40,120,60)
+	
+.square.W.available
+	background-color: rgb(40,200,160)
+	
+.square.B.capturable,
+.square.B.capturable-en-passant
+	background-color: rgb(120,20,70)
+	
+.square.W.capturable,
+.square.W.capturable-en-passant
+	background-color: rgb(180,20,80)
+	
+.promote-pawn
+	width: 400px
+	display: flex
+	flex-direction: row
+	flex-wrap: nowrap
+	
+	
+.square[data-piece='W R']
+	background-image: url(../media/icons/rook_white.svg)
+	
+.square[data-piece='W N']
+	background-image: url(../media/icons/knight_white.svg)
+	
+.square[data-piece='W B']
+	background-image: url(../media/icons/bishop_white.svg)
+	
+.square[data-piece='W Q']
+	background-image: url(../media/icons/queen_white.svg)
+	
+.square[data-piece='W K']
+	background-image: url(../media/icons/king_white.svg)
+	
+.square[data-piece='W P']
+	background-image: url(../media/icons/pawn_white.svg)
+	
+	
+.square[data-piece='B R'],
+.pawn-promotion.R
+	background-image: url(../media/icons/rook_black.svg)
+	
+.square[data-piece='B N'],
+.pawn-promotion.N
+	background-image: url(../media/icons/knight_black.svg)
+	
+.square[data-piece='B B'],
+.pawn-promotion.B
+	background-image: url(../media/icons/bishop_black.svg)
+	
+.square[data-piece='B Q'],
+.pawn-promotion.Q
+	background-image: url(../media/icons/queen_black.svg)
+	
+.square[data-piece='B K']
+	background-image: url(../media/icons/king_black.svg)
+	
+.square[data-piece='B P']
+	background-image: url(../media/icons/pawn_black.svg)
+	
+	
+	
+.square:not([data-piece='none']):hover
+	cursor: pointer
+	
+.regicide
+	border: 3px solid yellow
+	
+.checked
+	border: 3px solid darkred
+	
+	
+.reset
+	text-decoration: underline
+	
+.reset:hover
+	cursor: pointer
+	
+.hidden
+	display: none
+	
+	
+	
+	
