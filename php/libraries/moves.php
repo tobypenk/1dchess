@@ -343,7 +343,20 @@
 		
 		/*
 			
+			/*
 			
+			scans a rank to determine what moves would be available to a long-range, diagonal-covering piece (bishop, 
+				queen)
+			
+			parameters:
+				board: board object representing current game state
+				start_square_i: the rank of the piece to evaluate
+				start_square_j: the file of the piece to evaluate
+				
+			returns:
+				array of move objects representing all legal moves along both diagonals in both directions
+						
+		*/
 		
 		*/
 		
@@ -353,7 +366,12 @@
 		$j=1;
 		
 		while (TRUE) {
-			$move = scan_square($board,$start_square_i+$i,$start_square_j+$j,$piece["player"],$start_square_i,$start_square_j);
+			$move = scan_square(
+				$board,
+				$start_square_i+$i,$start_square_j+$j,
+				$piece["player"],
+				$start_square_i,$start_square_j
+			);
 			array_push($moves,$move);
 			if ($move["status"] != "free") break;
 			$i +=1;
@@ -364,7 +382,12 @@
 		$j=-1;
 		
 		while (TRUE) {
-			$move = scan_square($board,$start_square_i+$i,$start_square_j+$j,$piece["player"],$start_square_i,$start_square_j);
+			$move = scan_square(
+				$board,
+				$start_square_i+$i,$start_square_j+$j,
+				$piece["player"],
+				$start_square_i,$start_square_j
+			);
 			array_push($moves,$move);
 			if ($move["status"] != "free") break;
 			$i +=1;
@@ -375,7 +398,12 @@
 		$j=1;
 		
 		while (TRUE) {
-			$move = scan_square($board,$start_square_i+$i,$start_square_j+$j,$piece["player"],$start_square_i,$start_square_j);
+			$move = scan_square(
+				$board,
+				$start_square_i+$i,$start_square_j+$j,
+				$piece["player"],
+				$start_square_i,$start_square_j
+			);
 			array_push($moves,$move);
 			if ($move["status"] != "free") break;
 			$i +=-1;
@@ -386,7 +414,12 @@
 		$j=-1;
 		
 		while (TRUE) {
-			$move = scan_square($board,$start_square_i+$i,$start_square_j+$j,$piece["player"],$start_square_i,$start_square_j);
+			$move = scan_square(
+				$board,
+				$start_square_i+$i,$start_square_j+$j,
+				$piece["player"],
+				$start_square_i,$start_square_j
+			);
 			array_push($moves,$move);
 			if ($move["status"] != "free") break;
 			$i +=-1;
@@ -400,8 +433,16 @@
 		
 		/*
 			
+			scans a rank to determine what moves would be available to a long-range, rank-covering piece (rook, queen)
 			
-			
+			parameters:
+				board: board object representing current game state
+				start_square_i: the rank of the piece to evaluate
+				start_square_j: the file of the piece to evaluate
+				
+			returns:
+				array of move objects representing all legal moves along that rank in both directions
+						
 		*/
 		
 		$moves = [];
@@ -429,6 +470,22 @@
 	}
 	
 	function scan_file($board,$start_square_i,$start_square_j) {
+		
+		/*
+			
+			scans a rank to determine what moves would be available to a long-range, file-covering piece (rook, queen)
+			
+			parameters:
+				board: board object representing current game state
+				start_square_i: the rank of the piece to evaluate
+				start_square_j: the file of the piece to evaluate
+				
+			returns:
+				array of move objects representing all legal moves along that file in both directions
+						
+		*/
+		
+		
 		$moves = [];
 		$piece = $board[$start_square_i][$start_square_j]["piece"];
 		$i=1;
@@ -533,7 +590,7 @@
 		/*
 			
 			determine the legality and effects a potential non-capturing move. this applies to pawns moving 
-				forward in the same file.
+				forward in the same file, as this is legal only if the destination square is empty.
 			
 			parameters:
 				board: the board object on which the move will be made
@@ -582,7 +639,7 @@
 		/*
 			
 			determine the legality and effects a potential capturing-only move. this applies to pawns capturing
-				diagonally.
+				diagonally, as this move results in capture but isn't legal to make without a capture.
 			
 			parameters:
 				board: the board object on which the move will be made
@@ -627,6 +684,19 @@
 	
 	function scan_for_threats($board,$start_square_i,$start_square_j) {
 		
+		/*
+			
+			determine what are the threats to a given piece
+			
+			parameters:
+				board: board object representing current game state
+				start_square_i: the rank of the piece to evaluate
+				start_square_j: the file of the piece to evaluate
+				
+			returns:
+				array of move objects representing the pieces threatening the target piece
+		*/
+		
 		global $move_scan_map;
 		$threats = [];
 		$piece = $board[$start_square_i][$start_square_j]["piece"];
@@ -655,6 +725,19 @@
 	
 	function scan_for_check($board,$player) {
 		
+		/*
+			
+			determines whether a player is in check
+			
+			parameters:
+				board: board object representing current game state
+				player: player whose position to evaluate ("W" or "B")
+				
+			returns:
+				array of move objects representing the pieces checking the king
+			
+		*/
+		
 		$king = locate_piece($board,"K",$player);
 		
 		$checks = scan_for_threats($board,$king["rank"],$king["file"]);
@@ -662,6 +745,20 @@
 	}
 	
 	function scan_for_conclusion($board,$initiative) {
+		
+		/*
+			
+			determine whether the game has ended
+			
+			parameters:
+				board: board object representing current game state
+				initiative: player whose turn it is
+			
+			returns:
+				string representing game state: one of "active," "stalemate," "x checked," "x mated," where x
+					is one of "W" or "B"
+			
+		*/
 		
 		$check = scan_for_check($board,$initiative);
 		
@@ -677,6 +774,22 @@
 	
 	function scan_for_options($board,$player) {
 		
+		/*
+			
+			finds all pieces that a player can move
+			
+			parameters:
+				board: board object representing the game's current state
+				player: the color of the player whose position to evaluate ("W" or "B")
+				
+			returns:
+				array of pieces that can move
+				
+			note - this does not return the locations of pieces that can move, or the potential moves themselves.
+				it is useful only to check for the existence of available moves, to determine checkmate/stalemate.
+			
+		*/
+		
 		$pieces_that_can_move = [];
 		for ($i=0; $i<8; $i++) {
 			for ($j=0; $j<8; $j++) {
@@ -688,9 +801,32 @@
 		return $pieces_that_can_move;
 	}
 	
-	function scan_for_draw($board) {}
+	function scan_for_draw($board) {
+		// not yet implemented
+	}
 	
 	function locate_piece($board,$piece,$player,$bishop_color=null) {
+		
+		/*
+			
+			find the location of a piece on the board; returns null / null if the piece does not exist
+			
+			parameters:
+				board: the board object representing the current game state
+				piece: the piece to be located (by letter; for example, "K" for the king)
+				player: the color of the player whose piece to find ("W" or "B")
+				bishop_color: to be specified only if a bishop is sought
+				
+			returns:
+				rank (int): the rank (i) of the piece 
+				filt (int): the file (j) of the piece
+				
+			note - the current implementation assumes this function will only be used to find a player's king (in=
+				spite of the bishop_color parameter). a future version may include the ability to locate an arbitrary
+				piece, but at present, if a piece other than a bishop or king is searched, this function returns only 
+				the first instance of that piece and is therefore unsuitable for arbitrary lookups.
+			
+		*/
 
 		for ($i=0; $i<8; $i++) {
 			for ($j=0; $j<8; $j++) {
@@ -709,6 +845,8 @@
 	
 	
 	
+	
+	// algebraic notation not yet supported
 	
 	function decompose_algebraic_move($algebraic_move) {}
 	
