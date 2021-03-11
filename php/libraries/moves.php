@@ -1,5 +1,6 @@
 <?php
 	
+	// map files to 0-based indices
 	$files = [
 		"a"=>0,
 		"b"=>1,
@@ -11,6 +12,7 @@
 		"h"=>7,
 	];
 	
+	// map letters to piece scanning functions
 	$move_scan_map = [
 		"P"=>"scan_pawn",
 		"R"=>"scan_rook",
@@ -21,6 +23,22 @@
 	];
 	
 	function move($board,$start_square_i,$start_square_j,$target_square_i,$target_square_j) {
+		
+		/*
+			update board to reflect a moved piece
+			
+			parameters:
+				board: the board object on which the move will be made
+				start_square i: the starting rank of the piece to be moved
+				start_square_j: the starting file of the piece to be moved
+				target_square_i: the destination rank of the piece to be moved
+				target_square_j: the destination file of the piece to be moved
+				
+			returns: 
+				array:
+					capture: captured piece, or null if no piece was captured
+					board: board object representing the updated board with the moved piece
+		*/
 		
 		$mover = $board[$start_square_i][$start_square_j];
 		$target = $board[$target_square_i][$target_square_j];
@@ -43,27 +61,68 @@
 	}
 	
 	function move_is_legal($board,$proposed_move) {
-		
+		// not yet implemented
 	}
 	
 	function scan_for_moves($board,$start_square_i,$start_square_j) {
 		
+		/*
+			finds legal moves for a given piece
+			
+			parameters:
+				board: the board object to search for moves
+				start_square i: the starting rank of the piece to be moved
+				start_square_j: the starting file of the piece to be moved
+				
+			returns:
+				array of move objects representing every legal move
+		*/
+		
 		global $move_scan_map;
 		$piece = $board[$start_square_i][$start_square_j];
-		$moves = $move_scan_map[$piece["piece"]["piece"]]($board,$start_square_i,$start_square_j);
 		$legal_moves = [];
+		
+		$moves = $move_scan_map[$piece["piece"]["piece"]]($board,$start_square_i,$start_square_j);
 		foreach ($moves as $move) {
+			
+			// free, capture, and capture en passant are the only statuses representing legal moves
 			if (!in_array($move["status"], ["free","capture","capture en passant"])) continue;
+			
+			// even if legal, need to ensure the move doesn't place the moving player in check
 			$sim_board = move($board,$move["start_i"],$move["start_j"],$move["target_i"],$move["target_j"])["board"];
 			$checks = scan_for_check($sim_board,$piece["piece"]["player"]);
 			if (count($checks) == 0) {
+				// if the move doesn't place the moving player in check, add it to the legal moves array
 				array_push($legal_moves,$move);
 			}
 		}
+		
 		return $legal_moves;
 	}
 	
 	function scan_pawn($board,$start_square_i,$start_square_j) {
+		
+		/*
+			scan for moves using the pawn move rules
+			
+			parameters:
+				board: the board object to search for moves
+				start_square i: the starting rank of the piece to be moved
+				start_square_j: the starting file of the piece to be moved
+				
+			returns:
+				array of move objects representing legal moves; each object contains:
+					status: [free, blocked, capture, capture en passant, off-board]
+					capture: coordinates of captured piece if any, null if none
+					target_i: rank to which the piece moves
+					target_j: file to which the piece moves
+					start_i: rank from which the piece started
+					start_j: file from which the piece started
+				
+			note - this function does not currently scan to ensure the moving player isn't placed in check by
+				their own move. a future version / refactor would likely perform this task within the scan
+				functions and not in the wrapper (scan_for_moves()).
+		*/
 		
 		$moves = [];
 		$piece = $board[$start_square_i][$start_square_j]["piece"];
@@ -83,7 +142,6 @@
 				]);
 			}
 		}
-		
 		
 		// account for blockage in skip move
 		if ($piece["player"] == "W") {
@@ -111,6 +169,28 @@
 	
 	function scan_knight($board,$start_square_i,$start_square_j) {
 		
+		/*
+			scan for moves using the knight move rules
+			
+			parameters:
+				board: the board object to search for moves
+				start_square i: the starting rank of the piece to be moved
+				start_square_j: the starting file of the piece to be moved
+				
+			returns:
+				array of move objects representing legal moves; each object contains:
+					status: [free, blocked, capture, capture en passant, off-board]
+					capture: coordinates of captured piece if any, null if none
+					target_i: rank to which the piece moves
+					target_j: file to which the piece moves
+					start_i: rank from which the piece started
+					start_j: file from which the piece started
+				
+			note - this function does not currently scan to ensure the moving player isn't placed in check by
+				their own move. a future version / refactor would likely perform this task within the scan
+				functions and not in the wrapper (scan_for_moves()).
+		*/
+		
 		$moves = [];
 		$piece = $board[$start_square_i][$start_square_j]["piece"];
 		
@@ -127,6 +207,28 @@
 	}
 	
 	function scan_king($board,$start_square_i,$start_square_j) {
+		
+		/*
+			scan for moves using the king move rules
+			
+			parameters:
+				board: the board object to search for moves
+				start_square i: the starting rank of the piece to be moved
+				start_square_j: the starting file of the piece to be moved
+				
+			returns:
+				array of move objects representing legal moves; each object contains:
+					status: [free, blocked, capture, capture en passant, off-board]
+					capture: coordinates of captured piece if any, null if none
+					target_i: rank to which the piece moves
+					target_j: file to which the piece moves
+					start_i: rank from which the piece started
+					start_j: file from which the piece started
+				
+			note - this function does not currently scan to ensure the moving player isn't placed in check by
+				their own move. a future version / refactor would likely perform this task within the scan
+				functions and not in the wrapper (scan_for_moves()).
+		*/
 		
 		$moves = [];
 		$piece = $board[$start_square_i][$start_square_j]["piece"];
@@ -145,12 +247,56 @@
 	
 	function scan_bishop($board,$start_square_i,$start_square_j) {
 		
+		/*
+			scan for moves using the bishop move rules
+			
+			parameters:
+				board: the board object to search for moves
+				start_square i: the starting rank of the piece to be moved
+				start_square_j: the starting file of the piece to be moved
+				
+			returns:
+				array of move objects representing legal moves; each object contains:
+					status: [free, blocked, capture, capture en passant, off-board]
+					capture: coordinates of captured piece if any, null if none
+					target_i: rank to which the piece moves
+					target_j: file to which the piece moves
+					start_i: rank from which the piece started
+					start_j: file from which the piece started
+				
+			note - this function does not currently scan to ensure the moving player isn't placed in check by
+				their own move. a future version / refactor would likely perform this task within the scan
+				functions and not in the wrapper (scan_for_moves()).
+		*/
+		
 		$moves = [];
 		array_push($moves,scan_diagonals($board,$start_square_i,$start_square_j));
 		return array_reduce($moves, 'array_merge', array());
 	}
 	
 	function scan_rook($board,$start_square_i,$start_square_j) {
+		
+		/*
+			scan for moves using the rook move rules
+			
+			parameters:
+				board: the board object to search for moves
+				start_square i: the starting rank of the piece to be moved
+				start_square_j: the starting file of the piece to be moved
+				
+			returns:
+				array of move objects representing legal moves; each object contains:
+					status: [free, blocked, capture, capture en passant, off-board]
+					capture: coordinates of captured piece if any, null if none
+					target_i: rank to which the piece moves
+					target_j: file to which the piece moves
+					start_i: rank from which the piece started
+					start_j: file from which the piece started
+				
+			note - this function does not currently scan to ensure the moving player isn't placed in check by
+				their own move. a future version / refactor would likely perform this task within the scan
+				functions and not in the wrapper (scan_for_moves()).
+		*/
 		
 		$moves = [];
 
@@ -162,6 +308,28 @@
 	
 	function scan_queen($board,$start_square_i,$start_square_j) {
 		
+		/*
+			scan for moves using the queen move rules
+			
+			parameters:
+				board: the board object to search for moves
+				start_square i: the starting rank of the piece to be moved
+				start_square_j: the starting file of the piece to be moved
+				
+			returns:
+				array of move objects representing legal moves; each object contains:
+					status: [free, blocked, capture, capture en passant, off-board]
+					capture: coordinates of captured piece if any, null if none
+					target_i: rank to which the piece moves
+					target_j: file to which the piece moves
+					start_i: rank from which the piece started
+					start_j: file from which the piece started
+				
+			note - this function does not currently scan to ensure the moving player isn't placed in check by
+				their own move. a future version / refactor would likely perform this task within the scan
+				functions and not in the wrapper (scan_for_moves()).
+		*/
+		
 		$moves = [];
 		
 		array_push($moves,scan_rank($board,$start_square_i,$start_square_j));
@@ -172,6 +340,13 @@
 	}
 	
 	function scan_diagonals($board,$start_square_i,$start_square_j) {
+		
+		/*
+			
+			
+		
+		*/
+		
 		$moves = [];
 		$piece = $board[$start_square_i][$start_square_j]["piece"];
 		$i=1;
@@ -222,6 +397,13 @@
 	}
 	
 	function scan_rank($board,$start_square_i,$start_square_j) {
+		
+		/*
+			
+			
+			
+		*/
+		
 		$moves = [];
 		$piece = $board[$start_square_i][$start_square_j]["piece"];
 		$j=1;
@@ -271,6 +453,27 @@
 	}
 	
 	function scan_square($board,$target_i,$target_j,$player,$start_i,$start_j) {
+		
+		/*
+			scan a single square to determine whether a piece can move there
+			
+			parameters:
+				board: the board object on which the move will be made
+				start_square i: the starting rank of the piece to be moved
+				start_square_j: the starting file of the piece to be moved
+				player: the color of the moving player
+				start_i: the destination rank of the piece to be moved
+				start_j: the destination file of the piece to be moved
+				
+			returns: 
+				move object:
+					status: [free, blocked, capture, capture en passant, off-board]
+					capture: coordinates of captured piece if any, null if none
+					target_i: rank to which the piece moves
+					target_j: file to which the piece moves
+					start_i: rank from which the piece started
+					start_j: file from which the piece started
+		*/
 		
 		if ($target_i < 0 | $target_i > 7 | $target_j < 0 | $target_j > 7) {
 			$status = "off-board";
@@ -327,6 +530,30 @@
 	
 	function scan_square_no_capture($board,$target_i,$target_j,$player,$start_i,$start_j) {
 		
+		/*
+			
+			determine the legality and effects a potential non-capturing move. this applies to pawns moving 
+				forward in the same file.
+			
+			parameters:
+				board: the board object on which the move will be made
+				start_square i: the starting rank of the piece to be moved
+				start_square_j: the starting file of the piece to be moved
+				player: the color of the moving player
+				start_i: the destination rank of the piece to be moved
+				start_j: the destination file of the piece to be moved
+				
+			returns: 
+				move object:
+					status: [free, blocked, capture, capture en passant, off-board]
+					capture: coordinates of captured piece if any, null if none
+					target_i: rank to which the piece moves
+					target_j: file to which the piece moves
+					start_i: rank from which the piece started
+					start_j: file from which the piece started
+		
+		*/
+		
 		if ($target_i < 0 | $target_i > 7 | $target_j < 0 | $target_j > 7) {
 			$status = "off-board";
 			$capture = null;
@@ -351,6 +578,30 @@
 	}
 	
 	function scan_square_capture_only($board,$target_i,$target_j,$player,$start_i,$start_j) {
+		
+		/*
+			
+			determine the legality and effects a potential capturing-only move. this applies to pawns capturing
+				diagonally.
+			
+			parameters:
+				board: the board object on which the move will be made
+				start_square i: the starting rank of the piece to be moved
+				start_square_j: the starting file of the piece to be moved
+				player: the color of the moving player
+				start_i: the destination rank of the piece to be moved
+				start_j: the destination file of the piece to be moved
+				
+			returns: 
+				move object:
+					status: [free, blocked, capture, capture en passant, off-board]
+					capture: coordinates of captured piece if any, null if none
+					target_i: rank to which the piece moves
+					target_j: file to which the piece moves
+					start_i: rank from which the piece started
+					start_j: file from which the piece started
+		
+		*/
 		
 		if ($target_i < 0 | $target_i > 7 | $target_j < 0 | $target_j > 7) {
 			$status = "off-board";
