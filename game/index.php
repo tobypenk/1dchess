@@ -107,6 +107,7 @@
 				method: "GET",
 				data: {game_id: get_game_id()},
 				success: function(e) {
+					console.log(e);
 					e = JSON.parse(e);
 					console.log(e);
 					update_dom(e);
