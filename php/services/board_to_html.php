@@ -13,9 +13,10 @@
 			end_view_html: the HTML object representing the HTML state of the end-board data structure
 		
 	*/
-
-	$html = get_top_view($board);
-	$end_view_html = end_view_html($board);
+	
+	$html = top_view_html($board);
+	$end_board = array_map(function($x){return get_end_view($x);}, $board);
+	$end_view_html = end_view_html($end_board);
 	
 	function top_view_html($board) {
 		
@@ -56,7 +57,7 @@
 		return $html;
 	}
 	
-	function end_view_html($board) {
+	function end_view_html($end_board) {
 		
 		/*
 			
@@ -70,8 +71,6 @@
 			
 		*/
 		
-		$end_board = array_map(function($x){return get_end_view($x);}, $board);
-	
 		$end_view_html = "";
 		
 		for ($i=count($end_board)-1; $i>=0; $i--) {

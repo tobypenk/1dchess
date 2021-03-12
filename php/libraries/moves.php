@@ -358,7 +358,7 @@
 						
 		*/
 		
-		*/
+		
 		
 		$moves = [];
 		$piece = $board[$start_square_i][$start_square_j]["piece"];
